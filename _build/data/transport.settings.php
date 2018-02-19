@@ -6,9 +6,19 @@ $tmp = array(
         'value' => '',
         'area' => PKG_NAME_LOWER . '.main',
     ),
+    'parameters_all' => array(
+        'xtype' => 'combo-boolean',
+        'value' => true,
+        'area' => PKG_NAME_LOWER . '.main',
+    ),
     'alert_method' => array(
         'xtype' => 'textfield',
         'value' => 'log',
+        'area' => PKG_NAME_LOWER . '.main',
+    ),
+    'alert_log_level' => array(
+        'xtype' => 'textfield',
+        'value' => 'error',
         'area' => PKG_NAME_LOWER . '.main',
     ),
     'email_to' => array(

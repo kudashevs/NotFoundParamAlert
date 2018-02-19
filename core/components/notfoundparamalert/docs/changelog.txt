@@ -1,5 +1,11 @@
 Changelog for LastModified
 
+1.0.1-pl
+==============
+- Add include all URL parameters or not option
+- Add log level choice option
+- Update lexicon files
+
 1.0.0-pl
 ==============
 - Initial release

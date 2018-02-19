@@ -13,12 +13,12 @@ if ($modx->event->name === 'OnPageNotFound') {
         return '';
     }
 
-    $alertMethod = $modx->getOption('notfoundparamalert.alert_method');
+    $alertMethod = strtolower($modx->getOption('notfoundparamalert.alert_method'));
     $alertMethodAllowed = ['mail', 'log', 'both'];
-    $alertLevel = 'ERROR';
+    $alertLevel = strtoupper($modx->getOption('notfoundparamalert.alert_log_level')); // FATAL init site temporary unavailable and 500 header
     $alertLevelAllowed = ['FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG'];
     $requestMethod = 'GET';
-    $requestParams = $modx->request->getParameters($checkParams, $requestMethod);
+    $requestParams = $modx->getOption('notfoundparamalert.parameters_all') ? $modx->request->getParameters([], $requestMethod) : $modx->request->getParameters($checkParams, $requestMethod);
     $urlFull = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '';
     $urlPath = parse_url($urlFull, PHP_URL_PATH);
     $message = 'NotFoundParamAlert: ';
@@ -32,7 +32,7 @@ if ($modx->event->name === 'OnPageNotFound') {
 
     $logConst = array_flip($alertLevelAllowed);
     $logLevel = $logConst[$alertLevel];
-    $logParams = implode(', ', array_map(function($k, $v) { return $k . '=' . $v; }, array_keys($requestParams), $requestParams));
+    $logParams = implode('&', array_map(function($k, $v) { return $k . '=' . $v; }, array_keys($requestParams), $requestParams));
 
     if('mail' === $alertMethod || 'both' ===  $alertMethod) {
 
