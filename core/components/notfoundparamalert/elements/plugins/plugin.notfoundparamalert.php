@@ -7,32 +7,55 @@
  */
 if ($modx->event->name === 'OnPageNotFound') {
 
-    $checkParams = explode(',', $modx->getOption('notfoundparamalert.parameters'));
+    $requestMethod = 'GET';
+    $requestParams = $modx->request->getParameters([], $requestMethod);
+    $inputParams = explode(',', $modx->getOption('notfoundparamalert.parameters'));
 
-    if (!isset($modx->request) || empty($checkParams)) {
+    if (empty($requestParams) || empty($inputParams)) {
         return '';
     }
+
+    if (!function_exists('getWildParams')) {
+        function getWildParams($inputs, $params)
+        {
+            $output = [];
+            foreach ($inputs as $input) {
+                if (strpos($input, '*') !== false || strpos($input, '?') !== false) {
+                    foreach ($params as $pk => $pv) {
+                        if (fnmatch($input, $pk)) {
+                            $output[] = $pk;
+                        }
+                    }
+                } else {
+                    $output[] = $input;
+                }
+            }
+            return $output;
+        }
+    }
+
+    $checkParams = getWildParams($inputParams, $requestParams);
+    unset($inputParams, $requestParams);
 
     $alertMethod = strtolower($modx->getOption('notfoundparamalert.alert_method'));
     $alertMethodAllowed = ['mail', 'log', 'both'];
     $alertLevel = strtoupper($modx->getOption('notfoundparamalert.alert_log_level')); // FATAL init site temporary unavailable and 500 header
     $alertLevelAllowed = ['FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG'];
-    $requestMethod = 'GET';
-    $requestParams = $modx->getOption('notfoundparamalert.parameters_all') ? $modx->request->getParameters([], $requestMethod) : $modx->request->getParameters($checkParams, $requestMethod);
+    $foundParams = $modx->getOption('notfoundparamalert.parameters_all') ? $modx->request->getParameters([], $requestMethod) : $modx->request->getParameters($checkParams, $requestMethod);
     $urlFull = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '';
     $urlPath = parse_url($urlFull, PHP_URL_PATH);
     $message = 'NotFoundParamAlert: ';
 
     if (empty($alertMethod) || !in_array($alertMethod, $alertMethodAllowed) ||
         empty($alertLevel) || !in_array($alertLevel, $alertLevelAllowed) ||
-        empty($requestParams) || empty($urlPath))
+        empty($foundParams) || empty($urlPath))
     {
         return '';
     }
 
     $logConst = array_flip($alertLevelAllowed);
     $logLevel = $logConst[$alertLevel];
-    $logParams = implode('&', array_map(function($k, $v) { return $k . '=' . $v; }, array_keys($requestParams), $requestParams));
+    $logParams = implode('&', array_map(function($k, $v) { return $k . '=' . $v; }, array_keys($foundParams), $foundParams));
 
     if('mail' === $alertMethod || 'both' ===  $alertMethod) {
 

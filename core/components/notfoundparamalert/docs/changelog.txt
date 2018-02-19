@@ -1,5 +1,11 @@
 Changelog for LastModified
 
+1.0.2-pl
+==============
+- Add simple wildcard parameters match
+- Some code optimization
+- Update lexicon files
+
 1.0.1-pl
 ==============
 - Add include all URL parameters or not option
