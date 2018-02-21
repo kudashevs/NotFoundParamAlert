@@ -1,5 +1,12 @@
 Changelog for NotFoundParamAlert
 
+1.0.4-pl
+==============
+- Rename email_to system settings
+- Add mail method choice option
+- Add mail from option
+- Update lexicon files and docs
+
 1.0.3-pl
 ==============
 - Remove FATAL log level

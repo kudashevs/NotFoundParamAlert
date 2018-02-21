@@ -11,5 +11,9 @@ $_lang['setting_notfoundparamalert.alert_method'] = 'Способ уведомл
 $_lang['setting_notfoundparamalert.alert_method_desc'] = 'Способ доставки сгенерированного уведомления. Доступные значения: "log", "mail", "both".';
 $_lang['setting_notfoundparamalert.alert_log_level'] = 'Уровень логирования';
 $_lang['setting_notfoundparamalert.alert_log_level_desc'] = 'Уровень логирования при записи сообщений в журнал ошибок. Доступные значения: "error", "warn", "info", "debug".';
-$_lang['setting_notfoundparamalert.email_to'] = 'Email to';
-$_lang['setting_notfoundparamalert.email_to_desc'] = 'Введите валидный email адрес куда будут отправляться сообщения.';
+$_lang['setting_notfoundparamalert.mail_method'] = 'Способ отправки почты';
+$_lang['setting_notfoundparamalert.mail_method_desc'] = 'Отправка почты встроенной в php функцией <a href="http://php.net/manual/ru/function.mail.php" target="_blank">mail</a> или использовать MODX мейлер. Доступные значения: "php", "modx".';
+$_lang['setting_notfoundparamalert.mail_from'] = 'От кого';
+$_lang['setting_notfoundparamalert.mail_from_desc'] = 'Введите валидный email адрес с которого будут отправляться сообщения. Если не заполнено по умолчанию сгенерирует: robot@site_url';
+$_lang['setting_notfoundparamalert.mail_to'] = 'Кому';
+$_lang['setting_notfoundparamalert.mail_to_desc'] = 'Введите валидный email адрес кому будут отправляться сообщения.';

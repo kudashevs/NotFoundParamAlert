@@ -26,7 +26,17 @@ $tmp = array(
         'value' => 'error',
         'area' => PKG_NAME_LOWER . '.main',
     ),
-    'email_to' => array(
+    'mail_method' => array(
+        'xtype' => 'textfield',
+        'value' => 'php',
+        'area' => PKG_NAME_LOWER . '.main',
+    ),
+    'mail_from' => array(
+        'xtype' => 'textfield',
+        'value' => '',
+        'area' => PKG_NAME_LOWER . '.main',
+    ),
+    'mail_to' => array(
         'xtype' => 'textfield',
         'value' => '',
         'area' => PKG_NAME_LOWER . '.main',

@@ -3,7 +3,7 @@
 define('PKG_NAME', 'NotFoundParamAlert');
 define('PKG_NAME_LOWER', strtolower(PKG_NAME));
 
-define('PKG_VERSION', '1.0.3');
+define('PKG_VERSION', '1.0.4');
 define('PKG_RELEASE', 'pl');
 define('PKG_AUTO_INSTALL', false);
 
@@ -38,5 +38,5 @@ define('BUILD_PLUGIN_UPDATE', true);
 define('BUILD_PLUGIN_STATIC', false);
 
 $BUILD_RESOLVERS = array(
-    //'setup',
+    'settings',
 );

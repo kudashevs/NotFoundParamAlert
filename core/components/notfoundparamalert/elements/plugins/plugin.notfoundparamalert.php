@@ -62,13 +62,12 @@ if ($modx->event->name === 'OnPageNotFound') {
 
     if('mail' === $alertMethod || 'both' ===  $alertMethod) {
 
-        $mailTo = ($modx->getOption('notfoundparamalert.email_to')) ? $modx->getOption('notfoundparamalert.email_to') : $modx->getOption('emailsender');
-
-        /** @var modPHPMailer $mail */
-        $mail = $modx->getService('mail', 'mail.modPHPMailer');
-        $mail->setHTML(true);
-        $mail->set(modMail::MAIL_SUBJECT, $modx->lexicon('email_subject', ['alertName' => $alertName]));
-        $mail->set(modMail::MAIL_BODY, $modx->lexicon('email_body', [
+        $mailMethod = strtolower($modx->getOption('notfoundparamalert.mail_method'));
+        $mailTo = ($modx->getOption('notfoundparamalert.mail_to')) ? $modx->getOption('notfoundparamalert.mail_to') : $modx->getOption('emailsender');
+        $mailFrom = ($modx->getOption('notfoundparamalert.mail_from')) ? $modx->getOption('notfoundparamalert.mail_from') : 'robot@' . preg_replace('/^www\./', '', parse_url($modx->getOption('site_url'), PHP_URL_HOST));
+        $mailName = trim($alertName, ' :[]');
+        $mailSubj = $modx->lexicon('email_subject', ['alertName' => $alertName]);
+        $mailBody = $modx->lexicon('email_body', [
             'alertName' => $alertName,
             'alertMethod' => $alertMethod,
             'siteName' => $modx->config['site_name'],
@@ -77,26 +76,54 @@ if ($modx->event->name === 'OnPageNotFound') {
             'urlFull' => $urlFull,
             'requestParams' => $logParams,
             'ipAddress' => $_SERVER['REMOTE_ADDR'],
-        ]));
-        $mail->set(modMail::MAIL_SENDER, $modx->getOption('emailsender'));
-        $mail->set(modMail::MAIL_FROM, $modx->getOption('emailsender'));
-        $mail->set(modMail::MAIL_FROM_NAME, trim($alertName, ' :[]'));
-        $mail->address('to', $mailTo);
-        $mail->address('reply-to', $modx->getOption('emailsender'));
-        if (!$mail->send()) {
-            $modx->log(xPDO::LOG_LEVEL_ERROR, $alertName . ' ERROR while sending email with error '. $modx->mail->mailer->ErrorInfo . '. Catched info on next string');
-            $modx->log($logLevel, $modx->lexicon('log_message', [
-                'alertName' => $alertName,
-                'alertMethod' => $alertMethod,
-                'siteName' => $modx->config['site_name'],
-                'siteUrl' => $modx->getOption('site_url'),
-                'urlPath' => $urlPath,
-                'urlFull' => $urlFull,
-                'requestParams' => $logParams,
-                'ipAddress' => $_SERVER['REMOTE_ADDR'],
-            ]));
+        ]);
+
+        if('modx' === $mailMethod) {
+            /** @var modPHPMailer $mail */
+            $mail = $modx->getService('mail', 'mail.modPHPMailer');
+            $mail->setHTML(true);
+            $mail->set(modMail::MAIL_SUBJECT, $mailSubj);
+            $mail->set(modMail::MAIL_BODY, $mailBody);
+            $mail->set(modMail::MAIL_SENDER, $mailFrom);
+            $mail->set(modMail::MAIL_FROM, $mailFrom);
+            $mail->set(modMail::MAIL_FROM_NAME, $mailName);
+            $mail->address('to', $mailTo);
+            $mail->address('reply-to', $mailFrom);
+            if (!$mail->send()) {
+                $modx->log(xPDO::LOG_LEVEL_ERROR, $alertName . ' ERROR while sending email with ' . $mailMethod. ' error '. $modx->mail->mailer->ErrorInfo . '. Catched info on next string');
+                $modx->log($logLevel, $modx->lexicon('log_message', [
+                    'alertName' => $alertName,
+                    'alertMethod' => $alertMethod,
+                    'siteName' => $modx->config['site_name'],
+                    'siteUrl' => $modx->getOption('site_url'),
+                    'urlPath' => $urlPath,
+                    'urlFull' => $urlFull,
+                    'requestParams' => $logParams,
+                    'ipAddress' => $_SERVER['REMOTE_ADDR'],
+                ]));
+            }
+            $mail->reset();
+        } else {
+            $headers = 'From: ' . $mailName .' <' . $mailFrom . '>' . PHP_EOL;
+            $headers .= 'Reply-To: ' . $mailFrom . '' . PHP_EOL;
+            $headers .= 'Content-Type: text/html; charset=UTF-8' . PHP_EOL;
+            $headers .= 'Content-Transfer-Encoding: 8bit' . PHP_EOL;
+            $headers .= 'X-Mailer: PHP/' . phpversion();
+            $status = mail($mailTo, $mailSubj, $mailBody, $headers);
+            if (!$status) {
+                $modx->log(xPDO::LOG_LEVEL_ERROR, $alertName . ' ERROR while sending email with ' . $mailMethod. ' error '. error_get_last()['message'] . '. Catched info on next string');
+                $modx->log($logLevel, $modx->lexicon('log_message', [
+                    'alertName' => $alertName,
+                    'alertMethod' => $alertMethod,
+                    'siteName' => $modx->config['site_name'],
+                    'siteUrl' => $modx->getOption('site_url'),
+                    'urlPath' => $urlPath,
+                    'urlFull' => $urlFull,
+                    'requestParams' => $logParams,
+                    'ipAddress' => $_SERVER['REMOTE_ADDR'],
+                ]));
+            }
         }
-        $mail->reset();
     }
 
     if('log' === $alertMethod || 'both' ===  $alertMethod) {
