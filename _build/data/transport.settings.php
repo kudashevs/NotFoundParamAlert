@@ -11,6 +11,11 @@ $tmp = array(
         'value' => true,
         'area' => PKG_NAME_LOWER . '.main',
     ),
+    'alert_name' => array(
+        'xtype' => 'textfield',
+        'value' => 'NotFoundParamAlert:',
+        'area' => PKG_NAME_LOWER . '.main',
+    ),
     'alert_method' => array(
         'xtype' => 'textfield',
         'value' => 'log',

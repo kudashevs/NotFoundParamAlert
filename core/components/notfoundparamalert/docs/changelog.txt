@@ -1,4 +1,12 @@
-Changelog for LastModified
+Changelog for NotFoundParamAlert
+
+1.0.3-pl
+==============
+- Remove FATAL log level
+- Add component name option
+- Add fillable alert message/mail text
+- Update lexicon files and docs
+- Bug fix
 
 1.0.2-pl
 ==============

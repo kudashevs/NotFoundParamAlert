@@ -1,3 +1,4 @@
 <?php
-$_lang['email_subject'] = 'Страница не найдена';
-$_lang['email_body'] = 'NotFoundParamAlert уведомление: на сайте [[+siteUrl]] не найдена страница [[+urlPath]]<br />запрошенная с параметрами: [[+requestParams]]<br />с способом уведомления [[+alertMethod]] запрошенная с [[+ipAddress]]';
+$_lang['log_message'] = '[[+alertName]] страница [[+urlFull]] запрошенная с параметрами: [[+requestParams]] не найдена на сайте [[+siteName]] способ уведомления [[+alertMethod]] IP адрес [[+ipAddress]]';
+$_lang['email_subject'] = '[[+alertName]] параметр не найден';
+$_lang['email_body'] = 'Страница [[+urlFull]] не найдена на сайте [[+siteName]]<br />была запрошена с параметрами: [[+requestParams]]<br />способ уведомления [[+alertMethod]] IP адрес [[+ipAddress]]';
