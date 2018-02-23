@@ -7,8 +7,8 @@
  */
 if ($modx->event->name === 'OnPageNotFound') {
 
-    if (!function_exists('getWildParams')) {
-        function getWildParams($inputs, $params)
+    if (!function_exists('getWildcardParams')) {
+        function getWildcardParams($inputs, $params)
         {
             $output = [];
             foreach ($inputs as $input) {
@@ -29,9 +29,9 @@ if ($modx->event->name === 'OnPageNotFound') {
     }
 
     $requestMethod = 'GET';
+    $inputParams = array_map('trim', explode(',', $modx->getOption('notfoundparamalert.parameters')));
     $requestParams = $modx->request->getParameters([], $requestMethod);
-    $inputParams = explode(',', $modx->getOption('notfoundparamalert.parameters'));
-    $checkParams = getWildParams($inputParams, $requestParams);
+    $checkParams = getWildcardParams($inputParams, $requestParams);
 
     if (empty($requestParams) || empty($inputParams) || empty($checkParams)) {
         return '';
@@ -39,19 +39,28 @@ if ($modx->event->name === 'OnPageNotFound') {
     unset($inputParams, $requestParams);
 
     $alertName = $modx->getOption('notfoundparamalert.alert_name');
-    $alertMethod = strtolower($modx->getOption('notfoundparamalert.alert_method'));
-    $alertMethodAllowed = ['mail', 'log', 'both'];
+    $alertMethod = array_map('trim', explode(',', strtolower($modx->getOption('notfoundparamalert.alert_method'))));
+    $alertMethodAllowed = ['mail', 'log']; // 'db'
     $alertLevel = strtoupper($modx->getOption('notfoundparamalert.alert_log_level'));
-    $alertLevelAllowed = ['1' => 'ERROR', '2' => 'WARN', '3' => 'INFO', '4' => 'DEBUG']; // FATAL init site temporary unavailable and 500 header
+    $alertLevelAllowed = [1 => 'ERROR', 2 => 'WARN', 3 => 'INFO', 4 => 'DEBUG']; // FATAL init site temporary unavailable and 500 header
     $foundParams = $modx->getOption('notfoundparamalert.parameters_all') ? $modx->request->getParameters([], $requestMethod) : $modx->request->getParameters($checkParams, $requestMethod);
+    $siteUrl = $modx->getOption('site_url');
     $urlParse = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '';
     $urlPath = parse_url($urlParse, PHP_URL_PATH);
-    $urlFull = $modx->getOption('site_url') . ltrim(parse_url($urlParse, PHP_URL_PATH), '/');
+    $urlFull = $siteUrl . ltrim(parse_url($urlParse, PHP_URL_PATH), '/');
 
-    if (empty($alertMethod) || !in_array($alertMethod, $alertMethodAllowed) ||
-        empty($alertLevel) || !in_array($alertLevel, $alertLevelAllowed) ||
-        empty($foundParams) || empty($urlPath))
+    if (empty($alertMethod) || empty($alertLevel) || empty($foundParams) || empty($urlPath))
     {
+        return '';
+    }
+
+    if (array_diff($alertMethod, $alertMethodAllowed)) {
+        $modx->log(xPDO::LOG_LEVEL_ERROR, $alertName . ' ERROR wrong alert_method. Check configuration.');
+        return '';
+    }
+
+    if (!in_array($alertLevel, $alertLevelAllowed)) {
+        $modx->log(xPDO::LOG_LEVEL_ERROR, $alertName . ' ERROR wrong alert_log_level. Check configuration.');
         return '';
     }
 
@@ -60,7 +69,7 @@ if ($modx->event->name === 'OnPageNotFound') {
     $logParams = implode('&', array_map(function($k, $v) { return $k . '=' . $v; }, array_keys($foundParams), $foundParams));
     $modx->lexicon->load('notfoundparamalert:default');
 
-    if('mail' === $alertMethod || 'both' ===  $alertMethod) {
+    if(in_array('mail', $alertMethod)) {
 
         $mailMethod = strtolower($modx->getOption('notfoundparamalert.mail_method'));
         $mailTo = ($modx->getOption('notfoundparamalert.mail_to')) ? $modx->getOption('notfoundparamalert.mail_to') : $modx->getOption('emailsender');
@@ -71,7 +80,7 @@ if ($modx->event->name === 'OnPageNotFound') {
             'alertName' => $alertName,
             'alertMethod' => $alertMethod,
             'siteName' => $modx->config['site_name'],
-            'siteUrl' => $modx->getOption('site_url'),
+            'siteUrl' => $siteUrl,
             'urlPath' => $urlPath,
             'urlFull' => $urlFull,
             'requestParams' => $logParams,
@@ -95,7 +104,7 @@ if ($modx->event->name === 'OnPageNotFound') {
                     'alertName' => $alertName,
                     'alertMethod' => $alertMethod,
                     'siteName' => $modx->config['site_name'],
-                    'siteUrl' => $modx->getOption('site_url'),
+                    'siteUrl' => $siteUrl,
                     'urlPath' => $urlPath,
                     'urlFull' => $urlFull,
                     'requestParams' => $logParams,
@@ -104,6 +113,7 @@ if ($modx->event->name === 'OnPageNotFound') {
             }
             $mail->reset();
         } else {
+            $mailSubj = '=?UTF-8?B?' . base64_encode($mailSubj) . '?=';
             $headers = 'From: ' . $mailName .' <' . $mailFrom . '>' . PHP_EOL;
             $headers .= 'Reply-To: ' . $mailFrom . '' . PHP_EOL;
             $headers .= 'Content-Type: text/html; charset=UTF-8' . PHP_EOL;
@@ -116,7 +126,7 @@ if ($modx->event->name === 'OnPageNotFound') {
                     'alertName' => $alertName,
                     'alertMethod' => $alertMethod,
                     'siteName' => $modx->config['site_name'],
-                    'siteUrl' => $modx->getOption('site_url'),
+                    'siteUrl' => $siteUrl,
                     'urlPath' => $urlPath,
                     'urlFull' => $urlFull,
                     'requestParams' => $logParams,
@@ -126,12 +136,12 @@ if ($modx->event->name === 'OnPageNotFound') {
         }
     }
 
-    if('log' === $alertMethod || 'both' ===  $alertMethod) {
+    if(in_array('log', $alertMethod)) {
         $modx->log($logLevel, $modx->lexicon('log_message', [
             'alertName' => $alertName,
             'alertMethod' => $alertMethod,
             'siteName' => $modx->config['site_name'],
-            'siteUrl' => $modx->getOption('site_url'),
+            'siteUrl' => $siteUrl,
             'urlPath' => $urlPath,
             'urlFull' => $urlFull,
             'requestParams' => $logParams,
@@ -139,4 +149,5 @@ if ($modx->event->name === 'OnPageNotFound') {
         ]));
     }
 
+    unset($checkParams, $foundParams);
 }

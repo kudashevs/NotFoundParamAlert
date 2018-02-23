@@ -1,16 +1,25 @@
 Changelog for NotFoundParamAlert
 
+1.0.5-pl
+==============
+- Add trim to options list
+- Add warning on wrong alert_method/_level
+- Remade get/use alert_method logic
+- Remove "both" alert_method parameter
+- Some code optimization
+- Update lexicon files and docs
+
 1.0.4-pl
 ==============
 - Rename email_to system settings
-- Add mail method choice option
-- Add mail from option
+- Add mail_method choice option
+- Add mail_from option
 - Update lexicon files and docs
 
 1.0.3-pl
 ==============
 - Remove FATAL log level
-- Add component name option
+- Add component alert_name option
 - Add fillable alert message/mail text
 - Update lexicon files and docs
 - Bug fix
