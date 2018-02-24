@@ -33,7 +33,7 @@ if ($modx->event->name === 'OnPageNotFound') {
     $requestParams = $modx->request->getParameters([], $requestMethod);
     $checkParams = getWildcardParams($inputParams, $requestParams);
 
-    if (empty($requestParams) || empty($inputParams) || empty($checkParams)) {
+    if (empty($inputParams) || empty($requestParams) || empty($checkParams)) {
         return '';
     }
     unset($inputParams, $requestParams);
@@ -72,13 +72,14 @@ if ($modx->event->name === 'OnPageNotFound') {
     if(in_array('mail', $alertMethod)) {
 
         $mailMethod = strtolower($modx->getOption('notfoundparamalert.mail_method'));
+        $mailType = ('modx' === $mailMethod) ? 'mail with MODX Mailer' : 'mail with PHP mail()';
         $mailTo = ($modx->getOption('notfoundparamalert.mail_to')) ? $modx->getOption('notfoundparamalert.mail_to') : $modx->getOption('emailsender');
         $mailFrom = ($modx->getOption('notfoundparamalert.mail_from')) ? $modx->getOption('notfoundparamalert.mail_from') : 'robot@' . preg_replace('/^www\./', '', parse_url($modx->getOption('site_url'), PHP_URL_HOST));
         $mailName = trim($alertName, ' :[]');
         $mailSubj = $modx->lexicon('email_subject', ['alertName' => $alertName]);
         $mailBody = $modx->lexicon('email_body', [
             'alertName' => $alertName,
-            'alertMethod' => $alertMethod,
+            'alertMethod' => $mailType,
             'siteName' => $modx->config['site_name'],
             'siteUrl' => $siteUrl,
             'urlPath' => $urlPath,
@@ -102,7 +103,7 @@ if ($modx->event->name === 'OnPageNotFound') {
                 $modx->log(xPDO::LOG_LEVEL_ERROR, $alertName . ' ERROR while sending email with ' . $mailMethod. ' error '. $modx->mail->mailer->ErrorInfo . '. Catched info on next string');
                 $modx->log($logLevel, $modx->lexicon('log_message', [
                     'alertName' => $alertName,
-                    'alertMethod' => $alertMethod,
+                    'alertMethod' => $mailType,
                     'siteName' => $modx->config['site_name'],
                     'siteUrl' => $siteUrl,
                     'urlPath' => $urlPath,
@@ -124,7 +125,7 @@ if ($modx->event->name === 'OnPageNotFound') {
                 $modx->log(xPDO::LOG_LEVEL_ERROR, $alertName . ' ERROR while sending email with ' . $mailMethod. ' error '. error_get_last()['message'] . '. Catched info on next string');
                 $modx->log($logLevel, $modx->lexicon('log_message', [
                     'alertName' => $alertName,
-                    'alertMethod' => $alertMethod,
+                    'alertMethod' => $mailType,
                     'siteName' => $modx->config['site_name'],
                     'siteUrl' => $siteUrl,
                     'urlPath' => $urlPath,
@@ -139,7 +140,7 @@ if ($modx->event->name === 'OnPageNotFound') {
     if(in_array('log', $alertMethod)) {
         $modx->log($logLevel, $modx->lexicon('log_message', [
             'alertName' => $alertName,
-            'alertMethod' => $alertMethod,
+            'alertMethod' => 'log',
             'siteName' => $modx->config['site_name'],
             'siteUrl' => $siteUrl,
             'urlPath' => $urlPath,

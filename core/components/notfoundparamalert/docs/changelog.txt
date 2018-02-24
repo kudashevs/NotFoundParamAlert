@@ -1,5 +1,10 @@
 Changelog for NotFoundParamAlert
 
+1.0.6-pl
+==============
+- Bugfix show alert_method message/mail text
+- More informative alert_method on mail
+
 1.0.5-pl
 ==============
 - Add trim to options list
