@@ -1,5 +1,14 @@
 Changelog for NotFoundParamAlert
 
+1.0.7-pl
+==============
+- Add database support
+- Add CMP page
+- Add getRemote() function
+- Build script update
+- Some refactoring
+- Update lexicon files and docs
+
 1.0.6-pl
 ==============
 - Bugfix show alert_method message/mail text

@@ -8,8 +8,8 @@ After installation use System settings notfoundparamalert namespace to set prefe
 ### Available system settings (namespace notfoundparamalert):
 
 * parameters – list of URL parameters, separated by coma, which will generate alert. Available simple wildcards: ? — one any symbol, * — group of symbols.
-* parameters_all – include in alert message all URL parameters or only matching parameters.
-* alert_method – alert method. Available values: "mail" – send alert message on email, "log" – log alert message.
+* parameters_all – include in alert message all URL parameters or only matching parameters. Not working with "db" setting. 
+* alert_method – alert method. Available values: "db" - save in a data base, "mail" – send alert message on email, "log" – log alert message. Can be used together.
 * alert_log_level – alert logging log level. Available values: "error", "warn", "info", "debug".
 * mail_method – send mail method. Available values: "php" – native php mail() function, "modx" – MODX mailer.
 * mail_from – valid email from which alert messages will be send.

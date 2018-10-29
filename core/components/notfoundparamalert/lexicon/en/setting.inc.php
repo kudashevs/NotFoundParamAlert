@@ -2,9 +2,9 @@
 $_lang['area_notfoundparamalert.main'] = 'Main';
 
 $_lang['setting_notfoundparamalert.parameters'] = 'URL parameters';
-$_lang['setting_notfoundparamalert.parameters_desc'] = 'List of URL parameters, separated by coma, which will generate alert. Feel free to use simple wildcards from <a href="http://php.net/manual/en/function.fnmatch.php" target="_blank">fnmatch</a>.';
+$_lang['setting_notfoundparamalert.parameters_desc'] = 'List of rules, separated by coma, which will generate alert. Feel free to use simple wildcards from <a href="http://php.net/manual/en/function.fnmatch.php" target="_blank">fnmatch</a>.';
 $_lang['setting_notfoundparamalert.parameters_all'] = 'Include all parameters';
-$_lang['setting_notfoundparamalert.parameters_all_desc'] = 'Include in alert message all URL parameters or only matching parameters.';
+$_lang['setting_notfoundparamalert.parameters_all_desc'] = 'Include in alert message all URL parameters not only matching parameters.';
 $_lang['setting_notfoundparamalert.alert_name'] = 'Component name';
 $_lang['setting_notfoundparamalert.alert_name_desc'] = 'Component name that will be displayed in generated alert messages.';
 $_lang['setting_notfoundparamalert.alert_method'] = 'Alert method';

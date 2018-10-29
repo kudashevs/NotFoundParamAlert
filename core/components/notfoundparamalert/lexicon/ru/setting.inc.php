@@ -2,9 +2,9 @@
 $_lang['area_notfoundparamalert.main'] = 'Основные';
 
 $_lang['setting_notfoundparamalert.parameters'] = 'URL параметры';
-$_lang['setting_notfoundparamalert.parameters_desc'] = 'Список параметров URL через запятую, которые будут вызывать уведомление. Можно использовать простые подстановки из <a href="http://php.net/manual/ru/function.fnmatch.php" target="_blank">fnmatch</a>.';
+$_lang['setting_notfoundparamalert.parameters_desc'] = 'Список правил, через запятую, которые будут вызывать уведомление. Можно использовать простые подстановки из <a href="http://php.net/manual/ru/function.fnmatch.php" target="_blank">fnmatch</a>.';
 $_lang['setting_notfoundparamalert.parameters_all'] = 'Учитывать все параметры';
-$_lang['setting_notfoundparamalert.parameters_all_desc'] = 'Включать в уведомление все URL параметры или только совпавшие с искомыми.';
+$_lang['setting_notfoundparamalert.parameters_all_desc'] = 'Включать в уведомление все URL параметры, а не только совпавшие с искомыми.';
 $_lang['setting_notfoundparamalert.alert_name'] = 'Название компонента';
 $_lang['setting_notfoundparamalert.alert_name_desc'] = 'Название компонента которое будет отображаться в генерируемых уведомлениях.';
 $_lang['setting_notfoundparamalert.alert_method'] = 'Способ уведомления';

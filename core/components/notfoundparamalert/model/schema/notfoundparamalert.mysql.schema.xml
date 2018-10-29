@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model package="notfoundparamalert" baseClass="xPDOObject" platform="mysql" defaultEngine="InnoDB" phpdoc-package="notfoundparamalert" version="1.1">
+    <object class="NotFoundParameter" table="notfound_parameters" extends="xPDOSimpleObject">
+        <field key="url_full" dbtype="varchar" precision="2048" phptype="string" null="false" default=""/>
+        <field key="parameters_all" dbtype="varchar" precision="1820" phptype="string" null="false" default=""/>
+        <field key="parameters_found" dbtype="varchar" precision="1820" phptype="string" null="false" default=""/>
+        <field key="parameters_pattern" dbtype="varchar" precision="255" phptype="string" null="false" default=""/>
+        <field key="ip_address" dbtype="varbinary" precision="16" phptype="string" null="false" default=""/>
+        <field key="time" dbtype="timestamp" phptype="timestamp" null="false" default="CURRENT_TIMESTAMP" index="index" />
+    </object>
+</model>

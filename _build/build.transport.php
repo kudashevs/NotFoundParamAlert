@@ -1,10 +1,4 @@
 <?php
-/**
- * MinifyHTML build script
- *
- * @package minifyhtml
- * @subpackage build
- */
 $mtime = microtime();
 $mtime = explode(' ', $mtime);
 $mtime = $mtime[1] + $mtime[0];
@@ -26,7 +20,7 @@ $sources = array(
     'docs' => $root . 'core/components/' . PKG_NAME_LOWER . '/docs/',
     'plugins' => $root . 'core/components/' . PKG_NAME_LOWER . '/elements/plugins/',
     'lexicon' => $root . 'core/components/' . PKG_NAME_LOWER . '/lexicon/',
-    //'source_assets' => $root . 'assets/components/' . PKG_NAME_LOWER,
+    'source_assets' => $root . 'assets/components/' . PKG_NAME_LOWER,
     'source_core' => $root . 'core/components/' . PKG_NAME_LOWER,
 );
 unset($root);
@@ -38,7 +32,7 @@ require_once $sources['build'] . '/includes/functions.php';
 $modx = new modX();
 $modx->initialize('mgr');
 $modx->setLogLevel(modX::LOG_LEVEL_INFO);
-$modx->setLogTarget('ECHO');
+$modx->setLogTarget(XPDO_CLI_MODE ? 'ECHO' : 'HTML');
 $modx->getService('error', 'error.modError');
 
 echo '<pre>';
@@ -46,7 +40,7 @@ echo '<pre>';
 $modx->loadClass('transport.modPackageBuilder', '', false, true);
 $builder = new modPackageBuilder($modx);
 $builder->createPackage(PKG_NAME_LOWER, PKG_VERSION, PKG_RELEASE);
-$builder->registerNamespace(PKG_NAME_LOWER, false, true, '{core_path}components/' . PKG_NAME_LOWER . '/');
+$builder->registerNamespace(PKG_NAME_LOWER, false, true, PKG_NAMESPACE_PATH);
 
 /* load system settings */
 if (defined('BUILD_SETTING_UPDATE')) {
@@ -66,6 +60,36 @@ if (defined('BUILD_SETTING_UPDATE')) {
         $modx->log(modX::LOG_LEVEL_INFO, 'Packaged in ' . count($settings) . ' System Settings.');
     }
     unset($settings, $setting, $attributes);
+}
+
+/* load menus */
+if (defined('BUILD_MENU_UPDATE')) {
+    $menus = include $sources['data'].'transport.menu.php';
+    $attributes = array (
+        xPDOTransport::PRESERVE_KEYS => true,
+        xPDOTransport::UPDATE_OBJECT => BUILD_MENU_UPDATE,
+        xPDOTransport::UNIQUE_KEY => 'text',
+        xPDOTransport::RELATED_OBJECTS => true,
+        xPDOTransport::RELATED_OBJECT_ATTRIBUTES => array (
+            'Action' => array (
+                xPDOTransport::PRESERVE_KEYS => false,
+                xPDOTransport::UPDATE_OBJECT => BUILD_ACTION_UPDATE,
+                xPDOTransport::UNIQUE_KEY => array ('namespace','controller'),
+            ),
+        ),
+    );
+    if (is_array($menus)) {
+        foreach ($menus as $menu) {
+            $vehicle = $builder->createVehicle($menu,$attributes);
+            $builder->putVehicle($vehicle);
+            /* @var modMenu $menu */
+            $modx->log(modX::LOG_LEVEL_INFO,'Packaged in menu "'.$menu->get('text').'".');
+        }
+    }
+    else {
+        $modx->log(modX::LOG_LEVEL_ERROR,'Could not package in menu.');
+    }
+    unset($vehicle,$menus,$menu,$attributes);
 }
 
 /* create category */
@@ -104,6 +128,10 @@ if (defined('BUILD_PLUGIN_UPDATE')) {
 $vehicle = $builder->createVehicle($category, $attr);
 
 /* now pack in resolvers */
+$vehicle->resolve('file',array(
+    'source' => $sources['source_assets'],
+    'target' => "return MODX_ASSETS_PATH . 'components/';",
+));
 $vehicle->resolve('file', array(
     'source' => $sources['source_core'],
     'target' => "return MODX_CORE_PATH . 'components/';",
